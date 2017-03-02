@@ -1,0 +1,11 @@
+{
+  "name": "antony",
+  "version": "1.0.0",
+  "description": "Chatroom project",
+  "main": "express.js",
+  "scripts": {
+    "test": "yo"
+  },
+  "author": "Anthony Cruz",
+  "license": "ISC"
+}

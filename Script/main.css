@@ -1,0 +1,108 @@
+
+h1{
+	color: red;
+}
+
+h2{
+	font-size: 16px;
+	margin-bottom: 0px;
+	margin-top: 0px;
+}
+
+.wrapper{
+	text-align: center;
+}
+
+.button{
+	margin: auto;
+	font-size: 1.3em;
+	margin-top: 50px;
+	margin-bottom: 30px;
+}
+
+.message-feed{
+	margin-top: 50px;
+	border: 1px;
+	border-style: solid;
+	box-shadow: 1px 1px 5px #888888;
+	height: 500px;
+	overflow: scroll;
+}
+
+
+#hidden-form{
+	position: absolute;
+	top: 25%;
+	left: 25%;
+	width: 50%;
+	height: 50%;
+	padding: 16px;
+	box-shadow: 1px 1px 5px #888888;
+	background-color: white;
+	z-index: 1002;
+	overflow: auto;
+}
+
+.formInst{
+	text-align: center;
+}
+
+#incorrect-name{
+	display:inline-block;
+}
+.userForm{
+
+}
+
+#messageField{
+	width: 80%;
+	padding: 0px;
+}
+
+.user-response{
+	background-color:#efefef;
+	margin: 9px;
+	padding: 10px;
+	border-radius: 8px;
+}
+
+.message-text{
+	background-color: white;
+	padding: 15px;
+	border-radius: 5px;
+}
+
+.message-nickname{
+	text-align: right;
+	padding-top: 15px;
+	padding-right: 30px;
+}
+
+#messageField{
+	display: block;
+	margin: auto;
+}
+
+#submitButtonRm{
+	display: block;
+	text-align: center;
+	margin-bottom: 50px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+ul{
+	padding-left: 0px;
+}
+
+li{
+	list-style: none;
+}
+
+.black-overlay {
+  background-color: black;
+  z-index: 1001;
+  -moz-opacity: 0.8;
+  opacity: .80;
+  filter: alpha(opacity=80);
+}
