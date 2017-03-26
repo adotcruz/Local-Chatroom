@@ -1,14 +1,18 @@
 $(document).ready(function() {
    var name, nickName;
-   id = -1;  
+   id = -1;
+   var socket = io.connect();
 
-   setInterval(getMessages, 3000);
+   // setInterval(getMessages, 3000);
    var messageForm = $('#messageForm').submit(sendMessage);
    $('#submitName').click(function() {
       name = $('#name').val();
       nickName = $('#nicknameEntry').val();
       $('#hidden-form').hide()
       $('#nicknameField').val(nickName)
+      socket.emit('join', meta('roomID'), nickName, function(messages){
+         displayMessages(messages);
+      });
    });
 
    function meta(name) {
@@ -39,21 +43,19 @@ $(document).ready(function() {
       });
    }
 
-   function getMessages(){
-      var ul = $('#message-list');
-      $.get('/'+meta('roomID')+'/messages', function(res){
-         var messages = res.messages;
-         for(var i = 0; i < (messages.length); i++){
-            var li = $('<li></li>');
-            if(messages[i]["id"] > id){
-               id = messages[i]["id"]
-               li.append("<div class='user-response'><div class='message-text'><p>" + messages[i]["body"]+"</p></div><div class='message-nickname'><h3>"+messages[i]["nickname"]+"</h3></div></div>");
-            ul.prepend(li);
-            }
-         }
-      });
-   }
 
+   function displayMessages(messages){
+      var ul = $('#message-list');
+      console.log(messages);
+      for(var i = 0; i < (messages.length); i++){
+         var li = $('<li></li>');
+         if(messages[i]["id"] > id){
+            id = messages[i]["id"]
+            li.append("<div class='user-response'><div class='message-text'><p>" + messages[i]["body"]+"</p></div><div class='message-nickname'><h3>"+messages[i]["nickname"]+"</h3></div></div>");
+         ul.prepend(li);
+         }
+      }
+   }
 
 
    $('#submitName').mouseover(function(){
@@ -67,28 +69,16 @@ $(document).ready(function() {
 
 
 //Socket SHIT
-   var socket = io.connect();
+   // socket.emit('nickname', nickname);
 
-   socket.on('messageName', function(param1, param2){
-
-   });
-   var users = [];
-   io.sockets.on('connection', function(socket){
-      users.push(socket);
-      //clients emit this when they join new rooms
-      socket.on('join', function(roomName, nickname, callback){
-         //this is a socket.io method
-         socket.join(roomName);
-         //
-         socket.nickname = nickname;
-      });
-
-      socket.on('disconnect', function(){
-         var idx = users.indexOf(socket);
-         users.splice(idx, 1);
-      })
+   socket.on('newMessage', function(nickname, message){
 
    });
+
+   // socket.on('membershipChanged', function(members){
+
+   // });
+
 
 //sending events in the reverse works the exact same way just call socket.emit()
 

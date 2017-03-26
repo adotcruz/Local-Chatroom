@@ -2,13 +2,12 @@ var colors = require('colors'),
 express = require('express'),
 bodyParser = require('body-parser'),
 http = require('http');
-
+var app = express();
 var server = http.createServer(app)
 var io = require('socket.io').listen(server);
 
 //Initialize global variables up here
 var serverNumber = 8081;
-var app = express();
 var hash = {};
 
 //used for sending html files
@@ -106,23 +105,51 @@ app.get('/:roomID/messages', function(req, res){
 });
 
 
+function getMessages(roomId){
+	console.log('messages');
+	var sql = 'SELECT id, nickname, body FROM messages WHERE room=$1 ORDER BY id ASC';
+	var q = conn.query(sql, roomId, function(error, result){
+		var messages = result.rows;
+		console.log(messages);
+		return messages;
+	});
+}
+
 
 //NEW FUNCTIONS TO IMPLEMENT
 
-join(roomName, nickname, callback);
-
-nickname(nickname);
-
-message(message);
-
-message(nickname, message, time);
-membershipChanged(room, nickname);
 
 //obtain a socket object or collection of socket objects and then call the emit method, the first parameter is name of the message, and any subsequent parameters are sent as function arguments
 
-var socker = ;///
-socket.emit('messageName', paramA, paramB, paramC);
 
+io.sockets.on('connection', function(socket){
+  //clients emit this when they join new rooms
+	socket.on('join', function(roomName, nickname, callback){
+		//this is a socket.io method
+		console.log(nickname + " joined chat in room " + roomName);
+		socket.join(roomName);//socket.io method
+		socket.nickname = nickname;//yay java script
+		//callback method
+		var sql = 'SELECT id, nickname, body FROM messages WHERE room=$1 ORDER BY id ASC';
+		var q = conn.query(sql, roomName, function(error, result){
+			var messages = result.rows;
+			callback(messages);
+		});
+	});
+
+	socket.on('message', function(message){
+		var roomName = Object.keys(io.sockets.adapter.sids[socket.id][1]);
+	});
+	
+	socket.on('disconnect', function(){
+
+	});
+	socket.on('error', function(){
+		console.log("error with sockets");
+	});
+
+
+});
 
 //LISTEN ON THIS PORT
 server.listen(serverNumber, function(){
