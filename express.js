@@ -30,13 +30,21 @@ app.use(express.static(__dirname + '/Script'));
 var anydb = require('any-db');
 var conn = anydb.createConnection('sqlite3://chatroom.db');
 conn.query(
-   'CREATE TABLE messages (id INTEGER PRIMARY KEY AUTOINCREMENT, room TEXT, nickname TEXT, body TEXT)'
+   'CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, room TEXT, nickname TEXT, body TEXT, time TEXT)'
 ).on('close', function() {
    console.log("TABLE SUCCESSFULLY CREATED");
 }).on('error', function() {
    console.log("TABLE FAILED TO CREATE");
 });
 
+
+conn.query(
+   'CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, room TEXT, nickname TEXT)'
+).on('close', function() {
+   console.log("TABLE SUCCESSFULLY CREATED");
+}).on('error', function() {
+   console.log("TABLE FAILED TO CREATE");
+});
 
 var chars = "ABCDEFGHJKLMNOPQRSTUVWXYZ123456789";
 var charLen = 6;
@@ -73,7 +81,6 @@ app.get('/:roomID', function(request, response) {
 
 app.post('/checkRoom', function(req, res){
 	console.log('- Request received:', req.method.red, req.url.underline);
-	console.log(req.body);
 	var room;
 	var roomNum = req.body.roomId;
 	if(hash[roomNum] === true){
@@ -83,26 +90,6 @@ app.post('/checkRoom', function(req, res){
 	}
 });
 
-//REQUESTS IN CHARGE OF MESSAGES
-
-app.post('/:roomID/messages', function(req, res){
-	var room = req.params.roomID;
-	var nickname = req.body.nickname;
-	var body = req.body.message;
-	conn.query("INSERT INTO messages (room, nickname, body) values ($1, $2, $3)", [room, nickname, body]).on('close', function(){
-		res.json({statusR: "success"});
-		}).on('error', function(){
-		res.json({statusR: "error"});
-	});
-});
-
-app.get('/:roomID/messages', function(req, res){
-	var sql = 'SELECT id, nickname, body FROM messages WHERE room=$1 ORDER BY id ASC';
-	var q = conn.query(sql, [req.params.roomID], function(error, result){
-		var messages = result.rows;
-		res.json({messages: messages});
-	});
-});
 
 
 function getMessages(roomId){
@@ -110,11 +97,25 @@ function getMessages(roomId){
 	var sql = 'SELECT id, nickname, body FROM messages WHERE room=$1 ORDER BY id ASC';
 	var q = conn.query(sql, roomId, function(error, result){
 		var messages = result.rows;
-		console.log(messages);
 		return messages;
 	});
 }
 
+function addUser(roomId, nickname){
+	conn.query("INSERT INTO users (room, nickname) values ($1, $2)", [roomId, nickname]).on('close', function(){
+		console.log("added user to db");
+	}).on('error', function(){
+		console.log("error adding user to db");
+	})
+}
+
+function deleteUser(roomId, nickname){
+	conn.query("DELETE FROM users where room=$1 and nickname=$2", [roomId, nickname]).on('close', function(){
+		console.log("deleted " + nickname + " from db");
+	}).on('error', function(){
+		console.log("error deleting user");
+	});
+}
 
 //NEW FUNCTIONS TO IMPLEMENT
 
@@ -129,20 +130,58 @@ io.sockets.on('connection', function(socket){
 		console.log(nickname + " joined chat in room " + roomName);
 		socket.join(roomName);//socket.io method
 		socket.nickname = nickname;//yay java script
+		addUser(roomName, nickname);
+		io.sockets.in(roomName).emit('newUser', nickname);
 		//callback method
-		var sql = 'SELECT id, nickname, body FROM messages WHERE room=$1 ORDER BY id ASC';
+		var sql = 'SELECT id, nickname, body, time FROM messages WHERE room=$1 ORDER BY id ASC';
 		var q = conn.query(sql, roomName, function(error, result){
+			if(error != null){
+				console.log('error getting from db');
+			}
 			var messages = result.rows;
 			callback(messages);
 		});
 	});
 
+	socket.on('getUsers', function(roomName, nickname, callback){
+		console.log(nickname + "asking for users");
+		var sql = 'SELECT nickname from users where room=$1 ORDER BY nickname';
+		conn.query(sql, roomName, function(error, result){
+			if(error != null){
+				console.log("error getting nicknames from db");
+			}
+			var users = result.rows;
+			callback(users);
+		});
+	});
+
 	socket.on('message', function(message){
-		var roomName = Object.keys(io.sockets.adapter.sids[socket.id][1]);
+		var roomName = Object.keys(io.sockets.adapter.sids[socket.id])[1];
+		var nickname = socket.nickname;
+		var d = new Date();
+		var hour = d.getHours();
+		var period = "";
+		if( hour == 0){
+			period = "am";
+			hour = 12;
+		}
+		else if( hour >= 12){
+			period = "pm";
+			hour = hour - 12
+		} else {
+			period = "am";
+		}
+		var time = hour + ":" + d.getMinutes() + period;
+		conn.query("INSERT INTO messages (room, nickname, body, time) values ($1, $2, $3, $4)", [roomName, nickname, message, time]).on('close', function(){
+			console.log("successfully submitted to db");
+			io.sockets.in(roomName).emit('newMessage', nickname, message, time);
+			}).on('error', function(){
+			console.log("error inserting into db");
+		});
 	});
 	
 	socket.on('disconnect', function(){
-
+		io.sockets.in(roomName).emit('removeUser', nickname);
 	});
 	socket.on('error', function(){
 		console.log("error with sockets");

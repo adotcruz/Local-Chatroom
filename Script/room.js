@@ -1,6 +1,5 @@
 $(document).ready(function() {
    var name, nickName;
-   id = -1;
    var socket = io.connect();
 
    // setInterval(getMessages, 3000);
@@ -10,9 +9,13 @@ $(document).ready(function() {
       nickName = $('#nicknameEntry').val();
       $('#hidden-form').hide()
       $('#nicknameField').val(nickName)
+      $('#submitButtonRm').prop('disabled', false);
       socket.emit('join', meta('roomID'), nickName, function(messages){
          displayMessages(messages);
       });
+      socket.emit('getUsers', meta('roomID'), nickName, function(users){
+         displayUsers(users);
+      })
    });
 
    function meta(name) {
@@ -26,33 +29,31 @@ $(document).ready(function() {
    function sendMessage(event) {
       // prevent the page from redirecting
       event.preventDefault();
-
       // get the parameters
-      var nickname = $('#nicknameField').val();
       var message = $('#messageField').val();
-
-
-      // send it to the server
-      $.post('/' + meta('roomID') + '/messages', {nickname : nickname, message : message}, function(res){
-         if(res.statusR != "success"){
-            alert("could not send message to serve");
-         } else{
-            $('#messageField').val('');
-            getMessages();
-         }
-      });
+      $('#messageField').val('')
+      socket.emit('message', message);
    }
 
 
    function displayMessages(messages){
       var ul = $('#message-list');
-      console.log(messages);
       for(var i = 0; i < (messages.length); i++){
          var li = $('<li></li>');
-         if(messages[i]["id"] > id){
-            id = messages[i]["id"]
-            li.append("<div class='user-response'><div class='message-text'><p>" + messages[i]["body"]+"</p></div><div class='message-nickname'><h3>"+messages[i]["nickname"]+"</h3></div></div>");
+         li.append("<div class='user-response'><div class='message-text'><p>" + 
+            messages[i]["body"]+"</p></div><div class='message-nickname'><h5 id='messagetime'>" + messages[i]["time"]  +
+            "</h5><h3 id='messagenick'>"+messages[i]["nickname"]+"</h3></div></div>");
          ul.prepend(li);
+      }
+   }
+
+   function displayUsers(users){
+      var ul = $('#nickname-list');
+      for( var i = 0; i < (users.length); i++){
+         if(users[i]["nickname"] != nickName){
+            var li = $('<li></li>');
+            li.append("<p>"+ users[i]["nickname"]+"</p>");
+            ul.append(li);
          }
       }
    }
@@ -71,8 +72,29 @@ $(document).ready(function() {
 //Socket SHIT
    // socket.emit('nickname', nickname);
 
-   socket.on('newMessage', function(nickname, message){
+   socket.on('newMessage', function(nickname, message, time){
+      var ul = $('#message-list');
+      var li = $('<li></li>');
+      if(nickname === nickName){
+         li = $('<li id="currentuser"></li>');
+         li.append("<div class='current-user-response'><div class='message-text'><p>" + 
+         message+"</p></div><div class='message-nickname'><h5 id='messagetime'>"+ 
+         time+ "</h5><h3 id='messagecurrnick'>"+nickname+"</h3></div></div>");
+      } else {
+         li.append("<div class='user-response'><div class='message-text'><p>" + 
+         message+"</p></div><div class='message-nickname'><h5 id='messagetime'>"+ 
+         time+ "</h5><h3 id='messagenick'>"+nickname+"</h3></div></div>");
+      }
+      ul.prepend(li);
+   });
 
+   socket.on('newUser', function(nickname){
+      if(nickname != nickName){
+         var ul = $('#nickname-list');
+         var li = $('<li></li>');
+         li.append("<p>"+ nickname +"</p>");
+         ul.append(li);
+      }
    });
 
    // socket.on('membershipChanged', function(members){

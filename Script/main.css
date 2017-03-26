@@ -59,14 +59,20 @@ h3{
 }
 
 .message-feed{
-	margin-top: 50px;
 	border: 1px;
 	border-style: solid;
 	box-shadow: 1px 1px 5px #888888;
-	height: 500px;
+	height: 400px;
 	overflow: scroll;
 }
 
+.nickname-feed{
+	border: 1px;
+	border-style: solid;
+	box-shadow: 1px 1px 5px #888888;
+	height: 400px;
+	overflow: scroll;
+}
 
 #hidden-form{
 	position: absolute;
@@ -110,10 +116,21 @@ h3{
 }
 
 .user-response{
+	min-width: 200px;
 	background-color:#efefef;
 	margin: 9px;
 	padding: 10px;
 	border-radius: 8px;
+	display:inline-block;
+}
+
+.current-user-response{
+	min-width: 200px;
+	background-color:#928CFF;
+	margin: 9px;
+	padding: 10px;
+	border-radius: 8px;
+	display:inline-block;
 }
 
 .message-text{
@@ -141,12 +158,35 @@ h3{
 	margin-right: auto;
 }
 
+#currentuser{
+	text-align: left;
+}
+#messagenick{
+	display: inline;
+}
+
+#messagecurrnick{
+	display: inline;
+	color: white;
+}
+
+#messagetime{
+	color: grey;
+	display: inline;
+	padding-right: 10px;
+}
+
 ul{
 	padding-left: 0px;
 }
 
 li{
 	list-style: none;
+	text-align: right;
+}
+
+p{
+	text-align: left;
 }
 
 .black-overlay {

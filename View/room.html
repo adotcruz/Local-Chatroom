@@ -24,21 +24,31 @@
 				<div class="custom-button" id="submitName"><p>Send<p></div>
 			</div><!--hidden-form--> 
 			<div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-8 col-xs-offset-2">
-
-				<div class="message-feed" id="message-container">
-					<ul id="message-list">
-
-					<ul>
-				</div><!--message-feed-->
 				<div class="message-response" id="reply">
 					<form method="POST" action="/{{roomID}}/messages" id="messageForm">
 						<!-- <input type="text" name="message" id="messageField"> -->
 						<textarea id="messageField" name ="message" type="text" cols="86" rows ="5" name="confirmationText"></textarea>
 						<input type="hidden" name="nickname" id="nicknameField" value="">
 						<br/>
-						<input type="submit" value="Send" id="submitButtonRm">
+						<input type="submit" value="Send" id="submitButtonRm" disabled>
 					</form>
 				</div><!--message-response-->
+				<div class="row">
+					<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+						<div class="message-feed" id="message-container">
+							<ul id="message-list">
+
+							</ul>
+						</div><!--message-feed-->
+					</div><!--col-->
+					<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+						<div class="nickname-feed" id="nickname-container">
+							<ul id="nickname-list">
+							</ul>
+						</div><!--nickname-->
+					</div><!--col-->
+				</div><!--row-->
+				
 			</div><!--col-lg-->
 		</div><!--row-->
 	</div><!--container-->
