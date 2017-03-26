@@ -5,6 +5,7 @@
 	<title>{{roomID}}</title>
 	<meta charset="utf-8"></meta>
 	<meta name="roomID" content="{{roomID}}">
+	<script src="/socket.io/socket.io.js"></script>
 	<script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 	<script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -20,7 +21,7 @@
 				<p class="userForm">Name: <span id="incorrect-name"><input type="text" name="name" id="name"></span></p>
 				<p class="userForm">Nickname: <input type="text" name="nickname" id="nicknameEntry">
 					<br/>
-				<input type="submit" value="Send" id="submitName">
+				<div class="custom-button" id="submitName"><p>Send<p></div>
 			</div><!--hidden-form--> 
 			<div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-8 col-xs-offset-2">
 

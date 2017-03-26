@@ -8,6 +8,23 @@ $(document).ready(function() {
       });
    });
 
+   $('#crtRm').mouseover(function(){
+      $(this).css('background-color', '#94D699');
+   });
+
+   $('#crtRm').mouseleave(function(){
+      $(this).css('background-color', '#a5efab');
+   });
+
+
+   $('#submitFindRm').mouseover(function(){
+      $(this).css('background-color', '#4E17EB');
+   });
+
+   $('#submitFindRm').mouseleave(function(){
+      $(this).css('background-color', '#5519FF');
+   });
+
    $('#submitFindRm').click(function() {
    		var roomNum = $('#findRm').val();
    		roomNum.toUpperCase();

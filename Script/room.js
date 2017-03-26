@@ -54,6 +54,50 @@ $(document).ready(function() {
       });
    }
 
+
+
+   $('#submitName').mouseover(function(){
+      $(this).css('background-color', '#D1820B');
+   });
+
+   $('#submitName').mouseleave(function(){
+      $(this).css('background-color', '#FF9E0D');
+   });
+
+
+
+//Socket SHIT
+   var socket = io.connect();
+
+   socket.on('messageName', function(param1, param2){
+
+   });
+   var users = [];
+   io.sockets.on('connection', function(socket){
+      users.push(socket);
+      //clients emit this when they join new rooms
+      socket.on('join', function(roomName, nickname, callback){
+         //this is a socket.io method
+         socket.join(roomName);
+         //
+         socket.nickname = nickname;
+      });
+
+      socket.on('disconnect', function(){
+         var idx = users.indexOf(socket);
+         users.splice(idx, 1);
+      })
+
+   });
+
+//sending events in the reverse works the exact same way just call socket.emit()
+
+
+
+
+
+
+
 // <li>
 // <div class="user-response">
 // <div class="message-text">

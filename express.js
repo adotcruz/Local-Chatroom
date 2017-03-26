@@ -1,7 +1,10 @@
 var colors = require('colors'),
 express = require('express'),
-bodyParser = require('body-parser');
+bodyParser = require('body-parser'),
+http = require('http');
 
+var server = http.createServer(app)
+var io = require('socket.io').listen(server);
 
 //Initialize global variables up here
 var serverNumber = 8081;
@@ -89,7 +92,7 @@ app.post('/:roomID/messages', function(req, res){
 	var body = req.body.message;
 	conn.query("INSERT INTO messages (room, nickname, body) values ($1, $2, $3)", [room, nickname, body]).on('close', function(){
 		res.json({statusR: "success"});
-	}).on('error', function(){
+		}).on('error', function(){
 		res.json({statusR: "error"});
 	});
 });
@@ -104,8 +107,25 @@ app.get('/:roomID/messages', function(req, res){
 
 
 
-//LISTED ON THIS PORT
-app.listen(serverNumber, function(){
+//NEW FUNCTIONS TO IMPLEMENT
+
+join(roomName, nickname, callback);
+
+nickname(nickname);
+
+message(message);
+
+message(nickname, message, time);
+membershipChanged(room, nickname);
+
+//obtain a socket object or collection of socket objects and then call the emit method, the first parameter is name of the message, and any subsequent parameters are sent as function arguments
+
+var socker = ;///
+socket.emit('messageName', paramA, paramB, paramC);
+
+
+//LISTEN ON THIS PORT
+server.listen(serverNumber, function(){
   console.log(('- Server listening on port '+ serverNumber + '').grey);
 });
 
