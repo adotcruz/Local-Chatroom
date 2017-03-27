@@ -7,8 +7,9 @@ $(document).ready(function() {
    $('#submitName').click(function() {
       name = $('#name').val();
       nickName = $('#nicknameEntry').val();
-      $('#hidden-form').hide()
-      $('#nicknameField').val(nickName)
+      $('#hidden-form').hide();
+      $('#nickname-container').prepend("<h4>My nickname is  "+ nickName+ "</h4>")
+      $('#nicknameField').val(nickName);
       $('#submitButtonRm').prop('disabled', false);
       socket.emit('join', meta('roomID'), nickName, function(messages){
          displayMessages(messages);
@@ -51,7 +52,7 @@ $(document).ready(function() {
       var ul = $('#nickname-list');
       for( var i = 0; i < (users.length); i++){
          if(users[i]["nickname"] != nickName){
-            var li = $('<li></li>');
+            var li = $('<li id="nicknames-li"></li>');
             li.append("<p>"+ users[i]["nickname"]+"</p>");
             ul.append(li);
          }
@@ -91,12 +92,24 @@ $(document).ready(function() {
    socket.on('newUser', function(nickname){
       if(nickname != nickName){
          var ul = $('#nickname-list');
-         var li = $('<li></li>');
+         var li = $('<li id="nicknames-li"></li>');
          li.append("<p>"+ nickname +"</p>");
          ul.append(li);
       }
    });
 
+
+   socket.on('removeUser', function(nickname){
+      var listItems = $('#nicknames-li p');
+      listItems.each(function(idx, li){
+         var current = $(li);
+         var nameToDelete = current.html();
+         // console.log(current.html());
+         if(nickname === nameToDelete){
+            current.remove();
+         }
+      });
+   });
    // socket.on('membershipChanged', function(members){
 
    // });

@@ -130,6 +130,7 @@ io.sockets.on('connection', function(socket){
 		console.log(nickname + " joined chat in room " + roomName);
 		socket.join(roomName);//socket.io method
 		socket.nickname = nickname;//yay java script
+		socket.roomName = roomName;
 		addUser(roomName, nickname);
 		io.sockets.in(roomName).emit('newUser', nickname);
 		//callback method
@@ -144,7 +145,7 @@ io.sockets.on('connection', function(socket){
 	});
 
 	socket.on('getUsers', function(roomName, nickname, callback){
-		console.log(nickname + "asking for users");
+		console.log(nickname + " asking for users");
 		var sql = 'SELECT nickname from users where room=$1 ORDER BY nickname';
 		conn.query(sql, roomName, function(error, result){
 			if(error != null){
@@ -181,6 +182,9 @@ io.sockets.on('connection', function(socket){
 	});
 	
 	socket.on('disconnect', function(){
+		console.log("user disconnected");
+		var roomName = socket.roomName;
+		var nickname = socket.nickname;
 		io.sockets.in(roomName).emit('removeUser', nickname);
 	});
 	socket.on('error', function(){
